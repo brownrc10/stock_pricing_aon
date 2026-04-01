@@ -12,7 +12,7 @@ WITH log_returns AS (
     FROM hsy_stock_data_min.parquet
     )
     SELECT
-        STDDEV(log_return) * SQRT(252 * 390) AS annualized_vol
+        STDDEV(log_return) * SQRT(252 * 78) AS annualized_vol
         FROM log_returns
     WHERE log_return IS NOT NULL;
 ```
@@ -26,3 +26,4 @@ RFR was calclated from the 3-Year treasury dated 10/30/2025 with a semi-annual r
     FROM treasury_yield.parquet
     where Date = '10/30/2025'
 ```
+RFR Calculation 3.577%
