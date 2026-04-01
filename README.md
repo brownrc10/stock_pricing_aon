@@ -17,3 +17,12 @@ WITH log_returns AS (
     WHERE log_return IS NOT NULL;
 ```
 Volatillity Calculation: 0.2688474392751574
+
+## Calculating Risk Free Rate (RFR)
+RFR was calclated from the 3-Year treasury dated 10/30/2025 with a semi-annual rate of 3.61
+```sql
+    SELECT
+        (2*LN(1+("3 YR"/100)*(1/2)))*100 AS continous_rfr
+    FROM treasury_yield.parquet
+    where Date = '10/30/2025'
+```
