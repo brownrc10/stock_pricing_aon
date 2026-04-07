@@ -1,4 +1,4 @@
-name: Push to Hugging Face
+name: Huggin Face Sync
 on:
   push:
     branches: [main]
@@ -16,5 +16,6 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          git lfs install
           git remote add space https://USER:$HF_TOKEN@huggingface.co/spaces/b-rown3121/hersey-stock-pricing
           git push --force space main:main
