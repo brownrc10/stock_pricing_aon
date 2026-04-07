@@ -3,3 +3,4 @@
 development/
 uv.lock
 pyproject.toml
+hst_dashboard.py
