@@ -20,4 +20,6 @@ jobs:
           export PATH="/usr/local/bin:$PATH"
           git xet install
           git remote add space https://b-rown3121:$HF_TOKEN@huggingface.co/spaces/b-rown3121/hersey-stock-pricing
+          git add .gitattributes
+          git add data/hsy_stock_data.parquet images/sample_data.png
           git push --force space main:main
