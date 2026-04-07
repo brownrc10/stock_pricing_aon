@@ -4,7 +4,7 @@ emoji: 📈
 colorFrom: blue
 colorTo: green
 sdk: docker
-app_file: dockerfile
+app_file: Dockerfile
 pinned: false
 ---
 # Hershey Stock Reward Valuation Project
