@@ -1,4 +1,3 @@
-# Hershey Stock Reward Valuation Project
 ---
 title: Hersey Stock Pricing
 emoji: 📈
@@ -7,6 +6,8 @@ colorTo: green
 sdk: docker
 pinned: false
 ---
+# Hershey Stock Reward Valuation Project
+
 ## Calculating Volatillity
 Volatillity was calculated using minute aggregate data set from massive.com api. Data was restricted to trading hours between 9:30-4:30pm and resampled using pandas to a five minute window.
 ### Sample Data ![Sample Data](images/sample_data.png)
