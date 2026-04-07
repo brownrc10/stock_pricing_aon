@@ -4,3 +4,6 @@ development/
 uv.lock
 pyproject.toml
 hst_dashboard.py
+data/hsy_stock_data.parquet
+images/sample_data.png
+.DS_Store
