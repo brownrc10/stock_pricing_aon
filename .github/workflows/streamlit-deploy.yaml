@@ -19,5 +19,4 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/huggingface/xet-core/refs/heads/main/git_xet/install.sh | sh
           git xet install
           git remote add space https://b-rown3121:$HF_TOKEN@huggingface.co/spaces/b-rown3121/hersey-stock-pricing
-          git xet init
           git push --force space main:main
