@@ -26,8 +26,8 @@ SELECT
     (1.370 * 4 / spot_price)*100 AS dividend_yield
 FROM params
 ```
-Volatillity Calculation: 23.56
-Dividend Yield calculation: 3.202
+Volatillity Calculation: 23.56%
+Dividend Yield calculation: 3.202%
 
 ## Calculating Risk Free Rate (RFR)
 RFR was calclated from the 3-Year treasury dated 10/30/2025 with a semi-annual rate of 3.61
