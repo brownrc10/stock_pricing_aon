@@ -12,15 +12,11 @@ jobs:
           fetch-depth: 0
           lfs: true
 
-      - name: Install git-xet
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/huggingface/xet-core/refs/heads/main/git_xet/install.sh | sh
-          echo "/usr/local/bin" >> $GITHUB_PATH
-
       - name: Push to HuggingFace
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/huggingface/xet-core/refs/heads/main/git_xet/install.sh | sh
           git xet install
           git remote add space https://b-rown3121:$HF_TOKEN@huggingface.co/spaces/b-rown3121/hersey-stock-pricing
           git xet init
