@@ -7,6 +7,12 @@ jobs:
   sync-to-hub:
     runs-on: ubuntu-latest
     steps:
+      - name: Install git-xet
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/huggingface/xet-core/refs/heads/main/git_xet/install.sh | sh
+          export PATH="/usr/local/bin:$PATH"
+          git xet install
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -16,7 +22,6 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/huggingface/xet-core/refs/heads/main/git_xet/install.sh | sh
-          git xet install
+          export PATH="/usr/local/bin:$PATH"
           git remote add space https://b-rown3121:$HF_TOKEN@huggingface.co/spaces/b-rown3121/hersey-stock-pricing
           git push --force space main:main
