@@ -27,7 +27,7 @@ class MonteCarloSimulation:
         dividend_yield: float,
         volatility: float,
         reward_price: float = 300.00,
-        n_simulations: int = 500_000,
+        n_simulations: int = 100_000,
     ):
         self.stock_price = stock_price
         self.risk_free_rate = risk_free_rate
@@ -61,7 +61,7 @@ class MonteCarloSimulation:
         final_stock_prices = stock_paths[vested, -1]
         return final_stock_prices, vested
 
-    def simulation(self):
+    def simulation(self) -> dict:
         """Method that performs the Monte Carlo simulation"""
         total_trading_days = int(self._time * self._trading_days)
         delta_t = 1 / self._trading_days
@@ -82,7 +82,13 @@ class MonteCarloSimulation:
         present_reward_values = payouts * np.exp(-self.risk_free_rate * self._time)
         fair_value = np.sum(present_reward_values) / self.simulations
         vest_pct = vested.mean() * 100
-        print(f"Fair Value: ${fair_value:.4f}")
-        print(f"Vesting Percentag {vest_pct}")
-        print(f"Avg final price of vested: {stock_paths[vested, -1].mean():.2f}")
-        print(f"Avg final price of all runs: {stock_paths[:, -1].mean():.2f}")
+        payload = {
+            "stock_paths": stock_paths,
+            "vested": vested,
+            "total_trading_days": total_trading_days,
+            "fair_value": fair_value,
+            "vest_pct": vest_pct,
+            "final_price_vested": stock_paths[vested, -1].mean(),
+            "final_price_all_runs": stock_paths[:, -1].mean(),
+        }
+        return payload
