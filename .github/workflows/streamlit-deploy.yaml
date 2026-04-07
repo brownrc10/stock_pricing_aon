@@ -9,32 +9,27 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Install Git LFS
-        run: |
-          git lfs install
-
-      - name: Track binaries and Push
+      - name: Push to HuggingFace
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # 1. Initialize LFS and track the specific file types
+          # 1. Remove the existing .git folder so we have a fresh start
+          rm -rf .git
+
+          # 2. Re-initialize 
+          git init -b main
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          # 3. Setup LFS before adding files
+          git lfs install
           git lfs track "*.parquet"
           git lfs track "*.png"
 
-          # 2. Ensure .gitattributes is tracked
-          git add .gitattributes
+          # 4. Add everything and commit
+          git add .
+          git commit -m "Fresh deploy with LFS"
 
-          # 3. "Re-buffer" the files into LFS
-          # This forces Git to move the binaries out of the main history into LFS storage
-          git add data/hsy_stock_data.parquet
-          git add images/sample_data.png
-
-          # 4. Commit the changes locally
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git commit -m "Move binaries to LFS" || echo "No changes to commit"
-
-          # 5. Push to Hugging Face
+          # 5. Force push to overwrite the broken history on HF
           git remote add space https://b-rown3121:$HF_TOKEN@huggingface.co/spaces/b-rown3121/hersey-stock-pricing
           git push --force space main
