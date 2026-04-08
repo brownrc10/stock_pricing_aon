@@ -86,26 +86,26 @@ if "results" not in st.session_state or run:
 res = st.session_state.results
 st.title("HSY Performance Award Valuation")
 st.caption("Monte Carlo GBM risk-neutral framework 100,000 iterations")
-c1, c2, c3, c4, c5 = st.columns(5)
+c1, c2, c3, c4, c5, c6 = st.columns(6)
 c1.metric("Fair Value per Award", f"${res['fair_value'] / 100:,.2f}")
 c2.metric("Total Fair Value", f"${res['fair_value']:,.2f}")
 c3.metric("Vesting Probability", f"{res['vest_pct']:.2f}%")
 c4.metric("Expected Value of All Runs", f"${res['final_price_all_runs']:,.2f}")
-
+c5.metric("Mean Value of Vested", f"${res['final_price_vested']:,.2f}")
 if "market_info" not in st.session_state:
     st.session_state.market_info = StockMarketInfo()
 info = st.session_state.market_info
 if info.is_open:
     prev_price = info.last_price
     info.refresh()
-    c5.metric(
+    c6.metric(
         label="HSY Live Price",
         value=f"${info.last_price:,.2f}",
         delta=StockMarketInfo.price_change(info.last_price, prev_price),
         delta_color=StockMarketInfo.price_change_color(info.last_price, prev_price),
     )
 else:
-    c5.metric(label="HSY Last Price", value=f"${info.last_price:,.2f}")
+    c6.metric(label="HSY Last Price", value=f"${info.last_price:,.2f}")
 st.divider()
 
 stock_paths = res["stock_paths"]

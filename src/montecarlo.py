@@ -61,6 +61,9 @@ class MonteCarloSimulation:
         final_stock_prices = stock_paths[vested, -1]
         return final_stock_prices, vested
 
+    def _percentile_calculations(self, vested_paths: np.array) -> list:
+        pass
+
     def simulation(self) -> dict:
         """Method that performs the Monte Carlo simulation"""
         total_trading_days = int(self._time * self._trading_days)
@@ -80,6 +83,7 @@ class MonteCarloSimulation:
         )
         payouts = final_stock_price * 100
         present_reward_values = payouts * np.exp(-self.risk_free_rate * self._time)
+        present_reward_values.mean()
         fair_value = np.sum(present_reward_values) / self.simulations
         vest_pct = vested.mean() * 100
         payload = {

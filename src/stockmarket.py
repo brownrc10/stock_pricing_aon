@@ -36,13 +36,10 @@ class StockMarketInfo:
     def price_change_color(current: float, previous: float) -> str:
         # https://docs.streamlit.io/develop/api-reference/data/st.metric
 
-        match current:
-            case _ if current < previous:
-                return "inverse"
-            case _ if current > previous:
-                return "normal"
-            case _:
-                return "off"
+        if current == previous:
+            return "off"
+        else:
+            return "normal"
 
     @staticmethod
     def price_change(current_price: float, previous_price: float) -> float | None:
