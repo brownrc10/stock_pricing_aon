@@ -1,13 +1,41 @@
 import datetime
-from src.montecarlo import MonteCarloSimulation
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
+from src.montecarlo import MonteCarloSimulation
+from src.stockmarket import StockMarketInfo
+
+
+@st.cache_data(show_spinner=False)
+def run_simulation(
+    stock_price: float,
+    risk_free_rate: float,
+    dividend_yield: float,
+    volatility: float,
+    reward_price: float,
+):
+    """
+    USING METHOD TO ALLOW CACHING SO THAT WHEN THE STOCK REFRESHES
+    THE ENTIRE DASHBOARD DOES NOT REFRESH
+    """
+    return MonteCarloSimulation(
+        stock_price=stock_price,
+        risk_free_rate=risk_free_rate,
+        dividend_yield=dividend_yield,
+        volatility=volatility,
+        reward_price=reward_price,
+    ).simulation()
+
 
 st.set_page_config(
     page_title="HSY Award Valuation", layout="wide", initial_sidebar_state="collapsed"
 )
+
+# https://discuss.streamlit.io/t/streamlit-autorefresh/14519
+# Set to 30 seconds
+st_autorefresh(interval=30_000, key="price_refresh")
 
 with st.sidebar:
     st.title("Inputs")
@@ -21,24 +49,63 @@ with st.sidebar:
         "Dividend Yield", value=0.03202, step=0.001, format="%.5f"
     )
     run = st.button("Run Simulation", use_container_width=True)
+
+if "sim_inputs" not in st.session_state:
+    st.session_state.sim_inputs = dict(
+        stock_price=172.13,
+        risk_free_rate=0.03577,
+        dividend_yield=0.03202,
+        volatility=0.2356,
+        reward_price=300.00,
+    )
+if run:
+    run_simulation.clear()
+    st.session_state.sim_inputs = dict(
+        stock_price=initial_price,
+        risk_free_rate=risk_free_rate,
+        dividend_yield=dividend_yield,
+        volatility=volatility,
+        reward_price=reward_price,
+    )
+
 if "results" not in st.session_state or run:
     with st.spinner("Running Simulations..."):
-        st.session_state.results = MonteCarloSimulation(
-            stock_price=initial_price,
-            risk_free_rate=risk_free_rate,
-            dividend_yield=dividend_yield,
-            volatility=volatility,
-            reward_price=reward_price,
-        ).simulation()
+        st.session_state.results = run_simulation(**st.session_state.sim_inputs)
+        res = st.session_state.results
+        vested = res["vested"]
+
+        uninvested_paths = np.where(~vested)[0]
+        vested_paths = np.where(vested)[0]
+        st.session_state.sampled_unvested = np.random.choice(
+            uninvested_paths, size=min(20, len(uninvested_paths)), replace=False
+        )
+        st.session_state.sampled_vested = np.random.choice(
+            vested_paths, size=min(20, len(vested_paths)), replace=False
+        )
 
 res = st.session_state.results
 st.title("HSY Performance Award Valuation")
 st.caption("Monte Carlo GBM risk-neutral framework 100,000 iterations")
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Fair Value per Award", f"${res['fair_value'] / 100:,.2f}")
 c2.metric("Total Fair Value", f"${res['fair_value']:,.2f}")
 c3.metric("Vesting Probability", f"{res['vest_pct']:.2f}%")
 c4.metric("Expected Value of All Runs", f"${res['final_price_all_runs']:,.2f}")
+
+if "market_info" not in st.session_state:
+    st.session_state.market_info = StockMarketInfo()
+info = st.session_state.market_info
+if info.is_open:
+    prev_price = info.last_price
+    info.refresh()
+    c5.metric(
+        label="HSY Live Price",
+        value=f"${info.last_price:,.2f}",
+        delta=StockMarketInfo.price_change(info.last_price, prev_price),
+        delta_color=StockMarketInfo.price_change_color(info.last_price, prev_price),
+    )
+else:
+    c5.metric(label="HSY Last Price", value=f"${info.last_price:,.2f}")
 st.divider()
 
 stock_paths = res["stock_paths"]
@@ -48,10 +115,8 @@ business_days = pd.bdate_range(
     start=datetime.date(2025, 10, 30), periods=total_trading_days
 )
 fig = go.Figure()
-uninvested_paths = np.where(~vested)[0]
-for i in np.random.choice(
-    uninvested_paths, size=min(20, len(uninvested_paths)), replace=False
-):
+
+for i in st.session_state.sampled_unvested:
     fig.add_trace(
         go.Scatter(
             x=business_days,
@@ -62,10 +127,7 @@ for i in np.random.choice(
             hoverinfo="skip",
         )
     )
-vested_paths = np.where(vested)[0]
-for path, i in enumerate(
-    np.random.choice(vested_paths, size=min(20, len(vested_paths)), replace=False)
-):
+for path, i in enumerate(st.session_state.sampled_vested):
     fig.add_trace(
         go.Scatter(
             x=business_days,
@@ -78,11 +140,10 @@ for path, i in enumerate(
             hoverinfo="skip",
         )
     )
+
 fig.add_hline(
-    y=reward_price,
+    y=st.session_state.sim_inputs["reward_price"],
     line=dict(color="red", dash="dash", width=1.5),
-    # annotation_text=f"${reward_price:,.0f} Reward Price",
-    # annotation_font_color="red",
 )
 
 fig.update_layout(
