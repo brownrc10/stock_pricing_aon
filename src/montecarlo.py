@@ -27,7 +27,7 @@ class MonteCarloSimulation:
         dividend_yield: float,
         volatility: float,
         reward_price: float = 300.00,
-        n_simulations: int = 100_000,
+        n_simulations: int = 50_000,
     ):
         self.stock_price = stock_price
         self.risk_free_rate = risk_free_rate
@@ -61,8 +61,8 @@ class MonteCarloSimulation:
         final_stock_prices = stock_paths[vested, -1]
         return final_stock_prices, vested
 
-    def _percentile_calculations(self, vested_paths: np.array) -> list:
-        pass
+    def _percentile_calculations(self, stock_paths: np.array) -> list:
+        return np.percentile(stock_paths, [10, 25, 50, 75, 90], axis=0)
 
     def simulation(self) -> dict:
         """Method that performs the Monte Carlo simulation"""
@@ -86,6 +86,7 @@ class MonteCarloSimulation:
         present_reward_values.mean()
         fair_value = np.sum(present_reward_values) / self.simulations
         vest_pct = vested.mean() * 100
+        percentiles = self._percentile_calculations(stock_paths=stock_paths)
         payload = {
             "stock_paths": stock_paths,
             "vested": vested,
@@ -94,5 +95,6 @@ class MonteCarloSimulation:
             "vest_pct": vest_pct,
             "final_price_vested": stock_paths[vested, -1].mean(),
             "final_price_all_runs": stock_paths[:, -1].mean(),
+            "percentiles": percentiles,
         }
         return payload
