@@ -34,8 +34,8 @@ st.set_page_config(
 )
 
 # https://discuss.streamlit.io/t/streamlit-autorefresh/14519
-# Set to 30 seconds
-st_autorefresh(interval=90_000, key="price_refresh")
+# Set to 15 seconds
+st_autorefresh(interval=15_000, key="price_refresh")
 
 with st.sidebar:
     st.title("Inputs")
