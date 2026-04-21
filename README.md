@@ -8,9 +8,15 @@ app_file: Dockerfile
 pinned: false
 ---
 # Hershey Stock Reward Valuation Project
+## Deployment
+Link to Hugging space dashboard [Hershey Dashboard](https://huggingface.co/spaces/b-rown3121/hersey-stock-pricing)
+
+Dashboard deployed in a docker container on hugging face spaces. 
+CI Pipeline takes pull-requests into main and deploys code via github actions.
 
 ## Calculating Volatillity
-Volatillity was calculated using minute aggregate data set from massive.com api. Data was restricted to trading hours between 9:30-4:30pm and resampled using pandas to a five minute window.
+Volatillity was calculated using minute aggregate data set from massive.com api. Data was restricted to trading hours between 9:30-4:30pm and resampled using pandas to a five minute window
+
 ### Sample Data ![Sample Data](images/sample_data.png)
 ```sql
 WITH log_returns AS (
